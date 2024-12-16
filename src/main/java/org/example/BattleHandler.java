@@ -53,7 +53,7 @@ class BattleHandler {
         db.printHeroesFromDatabase();
         db.printEnemiesFromDatabase();
         System.out.println("\n=======1 SQL Запрос======");
-        db.printCharactersWithHigherHealthAndDamage(70,25);
+        db.printCharactersWithHigherHealthAndDamage(65,20);
         System.out.println("\n=======2 SQL Запрос======");
         db.printArchers();
 
@@ -75,12 +75,38 @@ class BattleHandler {
                 }
             }
 
+            if (character instanceof Mage mage) {
+                int maxSpellDamage = 0;
+                for (Spell spell : mage.getSpells()) {
+                    if (spell.getDamage() > maxSpellDamage) {
+                        maxSpellDamage = spell.getDamage();
+                    }
+                }
+                characterTotalPower += maxSpellDamage;
+            }
+
             int strongestTotalPower = strongest.getHealth() + strongest.getDamage();
+
+            if (strongest instanceof Archer archer) {
+                if (archer.getPet() != null) {
+                    strongestTotalPower += archer.getPet().getDamage();
+                }
+            }
+
+            if (strongest instanceof Mage mage) {
+                int maxSpellDamage = 0;
+                for (Spell spell : mage.getSpells()) {
+                    if (spell.getDamage() > maxSpellDamage) {
+                        maxSpellDamage = spell.getDamage();
+                    }
+                }
+                strongestTotalPower += maxSpellDamage;
+            }
+
             if (characterTotalPower > strongestTotalPower) {
                 strongest = character;
             }
         }
-
         return strongest;
     }
 
@@ -89,18 +115,34 @@ class BattleHandler {
             writer.write("Герои:\n");
             for (Hero hero : heroes) {
                 int totalDamage = hero.getDamage();
-                if (hero instanceof Archer) {
-                    Archer archer = (Archer) hero;
+                String additionalInfo = "";
+
+                if (hero instanceof Archer archer) {
                     if (archer.getPet() != null) {
                         totalDamage += archer.getPet().getDamage();
+                        additionalInfo = ", Питомец: " + archer.getPet().getName();
                     }
                 }
+
+                if (hero instanceof Mage mage) {
+                    Spell strongestSpell = null;
+                    int maxSpellDamage = 0;
+                    for (Spell spell : mage.getSpells()) {
+                        if (spell.getDamage() > maxSpellDamage) {
+                            maxSpellDamage = spell.getDamage();
+                            strongestSpell = spell;
+                        }
+                    }
+                    if (strongestSpell != null) {
+                        additionalInfo = ", Сильнейшее заклинание: " + strongestSpell.getName() +
+                                " (Урон: " + strongestSpell.getDamage() + ")";
+                    }
+                }
+
                 writer.write(hero.getClass().getSimpleName() +
                         " - Здоровье: " + hero.getHealth() +
                         ", Урон: " + totalDamage +
-                        (hero instanceof Archer && ((Archer) hero).getPet() != null
-                                ? ", Питомец: " + ((Archer) hero).getPet().getName()
-                                : "") +
+                        additionalInfo +
                         "\n");
             }
 

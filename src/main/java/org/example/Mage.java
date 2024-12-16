@@ -6,7 +6,7 @@ public class Mage extends Hero{
     private Spell[] spells;
 
     public Mage() {
-        super(40, 80, 20, 40);
+        super(30, 70, 10, 20);
         this.mana = new Mana(60);
         this.spells = new Spell[] {
                 new Spell("Огненный шар", 30, 20),
@@ -27,8 +27,13 @@ public class Mage extends Hero{
     public void attack(Character target) {
         if (target instanceof Enemy enemyTarget) {
             castSpell(enemyTarget, new Random().nextInt(spells.length));
+            mana.regenerate();
         } else {
             System.out.println("Маг не может атаковать этого персонажа.");
         }
+    }
+
+    public Spell[] getSpells(){
+        return spells;
     }
 }

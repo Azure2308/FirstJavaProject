@@ -5,7 +5,7 @@ public class Archer extends Hero {
     private Pet pet;
 
     public Archer() {
-        super(50, 90, 10, 30);
+        super(40, 80, 10, 30);
         this.pet = generateRandomPet();
     }
 
